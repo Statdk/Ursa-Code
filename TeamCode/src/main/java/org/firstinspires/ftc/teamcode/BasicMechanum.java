@@ -81,10 +81,10 @@ public class BasicMechanum extends LinearOpMode {
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
 
         backLeftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -126,14 +126,6 @@ public class BasicMechanum extends LinearOpMode {
             backRightDrive.setPower(backRightDrivePower);
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addLine();
-
-            telemetry.addData("Power: ", "Front Left Drive: " + frontLeftDrive.getPower());
-            telemetry.addData("Power: ", "Front Right Drive: " + frontRightDrive.getPower());
-            telemetry.addLine();
-
-            telemetry.addData("Power: ", "Back Left Drive: " + backLeftDrive.getPower());
-            telemetry.addData("Power: ", "Back Right Drive: " + backRightDrive.getPower());
             telemetry.update();
         }
     }
