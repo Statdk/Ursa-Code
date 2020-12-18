@@ -104,11 +104,11 @@ public class BackupBot extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            frontLeftDrivePower = -gamepad1.left_stick_y /*For driving forward/backward*/ - gamepad1.right_stick_x /*Turning*/ - gamepad1.left_stick_x /*Strafing*/;
-            frontRightDrivePower = -gamepad1.left_stick_y /*For driving forward/backward*/ + gamepad1.right_stick_x /*Turning*/ + gamepad1.left_stick_x /*Strafing*/;
+            frontLeftDrivePower = -gamepad1.left_stick_y /*For driving forward/backward*/ + gamepad1.right_stick_x /*Turning*/ - gamepad1.left_stick_x /*Strafing*/;
+            frontRightDrivePower = -gamepad1.left_stick_y /*For driving forward/backward*/ - gamepad1.right_stick_x /*Turning*/ - gamepad1.left_stick_x /*Strafing*/;
 
-            backLeftDrivePower = -gamepad1.left_stick_y /*For driving forward/backward*/ -gamepad1.right_stick_x /*Turning*/ + gamepad1.left_stick_x /*Strafing*/;
-            backRightDrivePower = -gamepad1.left_stick_y /*For driving forward/backward*/ + gamepad1.right_stick_x /*Turning*/ - gamepad1.left_stick_x /*Strafing*/;
+            backLeftDrivePower = -gamepad1.left_stick_y /*For driving forward/backward*/ + gamepad1.right_stick_x /*Turning*/ + gamepad1.left_stick_x /*Strafing*/;
+            backRightDrivePower = -gamepad1.left_stick_y /*For driving forward/backward*/ - gamepad1.right_stick_x /*Turning*/ + gamepad1.left_stick_x /*Strafing*/;
 
 
             frontLeftDrivePower = Range.clip(frontLeftDrivePower * Math.abs(frontLeftDrivePower), -1, 1);
@@ -125,6 +125,14 @@ public class BackupBot extends LinearOpMode {
             backRightDrive.setPower(backRightDrivePower);
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addLine();
+
+            telemetry.addData("Power: ", "Front Left Drive: " + frontLeftDrive.getPower());
+            telemetry.addData("Power: ", "Front Right Drive: " + frontRightDrive.getPower());
+            telemetry.addLine();
+
+            telemetry.addData("Power: ", "Back Left Drive: " + backLeftDrive.getPower());
+            telemetry.addData("Power: ", "Back Right Drive: " + backRightDrive.getPower());
             telemetry.update();
         }
     }
