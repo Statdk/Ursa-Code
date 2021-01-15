@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -73,10 +72,10 @@ public class TensorFlow extends LinearOpMode {
             "ASQvetT/////AAABmWgxsfDXYU6IkQfbRy6xzm449PyiWSSWyoYGxxxU1QQMvUdOnEyUJc2vEm2wdOUV0xBsN6N2wGY6O4RoMxhMW/PiuQ6w3bXBGhy9O7v86Org3IfjnP8EIJZNuKqls2trtBJQVQA5BGk5/5LUuJ7BpHFCaSLlRXpw7Fjr32ot6k12o9/5R1Cl1G744MIixVPxj7RJPWRGncoecju71NRbupFEGfxhBO3Bk49M3vtYEWkyUXjEbCPoCeYJ4+/BQlpMVNWBXT7ampzUnClI86RG1/8athMdklv0XN+iETWZMLrU/TuFvWCn+gk4F1amGjttNUNPQiEIjQY7geUXRX23Jc7Fsn/rEKbEVYw+mynLoaMn";
 
     /**
-     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
+     * {@link #vuforiaTensor} is the variable we will use to store our instance of the Vuforia
      * localization engine.
      */
-    private VuforiaLocalizer vuforia;
+    private VuforiaLocalizer vuforiaTensor;
 
     /**
      * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
@@ -138,6 +137,8 @@ public class TensorFlow extends LinearOpMode {
             }
         }
 
+
+
         if (tfod != null) {
             tfod.shutdown();
         }
@@ -156,7 +157,7 @@ public class TensorFlow extends LinearOpMode {
         parameters.cameraDirection = CameraDirection.BACK;
 
         //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+        vuforiaTensor = ClassFactory.getInstance().createVuforia(parameters);
 
         // Loading trackables is not necessary for the TensorFlow Object Detection engine.
     }
@@ -169,7 +170,7 @@ public class TensorFlow extends LinearOpMode {
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParameters.minResultConfidence = 0.8f;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforiaTensor);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 }
