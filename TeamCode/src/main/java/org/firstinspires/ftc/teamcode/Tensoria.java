@@ -109,7 +109,7 @@ public class Tensoria extends LinearOpMode {
          * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
          **/
         if (tfod != null) {
-            tfod.activate();
+            //tfod.activate();
 
             // The TensorFlow software will scale the input images from the camera to a lower resolution.
             // This can result in lower detection accuracy at longer distances (> 55cm or 22").
@@ -352,7 +352,7 @@ public class Tensoria extends LinearOpMode {
         VuforiaLocalizer.Parameters parametersTensor = new VuforiaLocalizer.Parameters();
 
         parametersTensor.vuforiaLicenseKey = VUFORIA_KEY;
-        parametersTensor.cameraDirection = CameraDirection.BACK;
+        parametersTensor.cameraDirection = CameraDirection.FRONT;
 
         //  Instantiate the Vuforia engine
         vuforiaTensor = ClassFactory.getInstance().createVuforia(parametersTensor);
