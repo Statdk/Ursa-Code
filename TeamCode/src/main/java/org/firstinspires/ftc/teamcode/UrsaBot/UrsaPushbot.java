@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 //hardware mapping for the robot, please contribute when necessary.
@@ -14,8 +15,15 @@ public class UrsaPushbot
     public DcMotor rightFront   = null;
     public DcMotor leftBack     = null;
     public DcMotor rightBack    = null;
+    public DcMotor wobbleGoalRot = null;
+    public DcMotor intakeMotor  = null;
+    public DcMotor intakeUp     = null;
     public Servo wobbleGoalLifter = null;
     public Servo wobbleGoalPusher = null;
+    boolean intakeToggle = true;
+    boolean intakeUpToggle = true;
+    double DRIVE_SPEED = 0.6;
+    double TURN_SPEED = 0.35;
 
     public static final double BRAKE = 0;
 
