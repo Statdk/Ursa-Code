@@ -277,15 +277,21 @@ public class TensoriaAutonomous extends LinearOpMode {
             // Filter the recognitions
             Recognition largestRecog = null;
             for (int i = 0; i < tfodRecogs.size(); i++) {
-                if (largestRecog != null && tfodRecogs.get(i).getHeight() > largestRecog.getHeight())
+                if (tfodRecogs.isEmpty()) break;
+                if (largestRecog == null) largestRecog = tfodRecogs.get(i);
+
+                if (tfodRecogs.get(i).getHeight() > largestRecog.getHeight())
                     largestRecog = tfodRecogs.get(i);
             }
 
-            if (largestRecog.getHeight() < largestRecog.getImageHeight() * 0.15) largestRecog = null;
+            if (largestRecog != null) {
+                if (largestRecog.getHeight() < 70)
+                    largestRecog = null;
+            }
 
             if (largestRecog == null) { // No rings found, go to tile A
                 telemetry.addData("Tile", "A");
-            } else if (largestRecog.getHeight() > /* SOME CONSTANT */ largestRecog.getImageHeight() * 0.25) { // Four ring found, go to tile C
+            } else if (largestRecog.getHeight() > /* SOME CONSTANT */ 150) { // Four ring found, go to tile C
                 telemetry.addData("Tile", "C");
             } else { // Middle ring height, go to tile B
                 telemetry.addData("Tile", "B");
@@ -314,7 +320,7 @@ public class TensoriaAutonomous extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.8f;
+        tfodParameters.minResultConfidence = 0.4f;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
