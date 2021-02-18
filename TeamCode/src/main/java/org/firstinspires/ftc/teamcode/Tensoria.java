@@ -245,7 +245,6 @@ public class Tensoria extends LinearOpMode {
         targetsUltimateGoal.activate();
 
 
-//        initVuforia();
         initTfod();
 
         if (tfod != null) {
@@ -272,7 +271,9 @@ public class Tensoria extends LinearOpMode {
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                List<Recognition> updatedRecognitions = tfod.getRecognitions();
+
+
                 if (updatedRecognitions != null) {
                     telemetry.addData("# Object Detected", updatedRecognitions.size());
 
@@ -284,6 +285,7 @@ public class Tensoria extends LinearOpMode {
                                 recognition.getLeft(), recognition.getTop());
                         telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
                                 recognition.getRight(), recognition.getBottom());
+                        telemetry.addLine(String.valueOf(recognition.getLeft()));
                     }
                 }
             }
@@ -328,9 +330,6 @@ public class Tensoria extends LinearOpMode {
         }
     }
 
-//    private void initVuforia() {
-//
-//    }
 
     /**
      * Initialize the TensorFlow Object Detection engine.
