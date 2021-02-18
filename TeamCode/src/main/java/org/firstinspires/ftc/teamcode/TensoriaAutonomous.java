@@ -268,9 +268,34 @@ public class TensoriaAutonomous extends LinearOpMode {
         runtime.reset();
         while (opModeIsActive()) {
 
-            getTfodRecognitions();
+            List<Recognition> tfodRecogs = getTfodRecognitions();
 
             getVuforia(allTrackables);
+
+            sleep(1000);
+
+            // Filter the recognitions
+            Recognition largestRecog = null;
+            for (int i = 0; i < tfodRecogs.size(); i++) {
+                if (largestRecog != null && tfodRecogs.get(i).getHeight() > largestRecog.getHeight())
+                    largestRecog = tfodRecogs.get(i);
+            }
+
+            if (largestRecog.getHeight() < largestRecog.getImageHeight() * 0.15) largestRecog = null;
+
+            if (largestRecog == null) { // No rings found, go to tile A
+                telemetry.addData("Tile", "A");
+            } else if (largestRecog.getHeight() > /* SOME CONSTANT */ largestRecog.getImageHeight() * 0.25) { // Four ring found, go to tile C
+                telemetry.addData("Tile", "C");
+            } else { // Middle ring height, go to tile B
+                telemetry.addData("Tile", "B");
+            }
+
+            if (largestRecog != null) {
+                telemetry.addData("Recognition Height", largestRecog.getHeight());
+                telemetry.addData("Recognition Height %", largestRecog.getHeight() / largestRecog.getImageHeight() * 10);
+            }
+            telemetry.update();
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
