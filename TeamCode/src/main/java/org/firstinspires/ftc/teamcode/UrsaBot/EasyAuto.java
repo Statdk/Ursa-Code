@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class EasyAuto extends LinearOpMode {
 
-    UrsaPushbot robot = new UrsaPushbot();
+    UrsaHardware robot = new UrsaHardware();
 
     protected static final double ticksPerInch = 64;
 

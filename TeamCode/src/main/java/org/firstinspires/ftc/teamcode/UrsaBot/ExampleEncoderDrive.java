@@ -27,15 +27,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.UrsaBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.UrsaBot.UrsaPushbot;
+import org.firstinspires.ftc.teamcode.UrsaBot.UrsaHardware;
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
@@ -69,7 +68,7 @@ import org.firstinspires.ftc.teamcode.UrsaBot.UrsaPushbot;
 public class ExampleEncoderDrive extends LinearOpMode {
 
     /* Declare OpMode members. */
-    UrsaPushbot robot   = new UrsaPushbot();   // Use a Pushbot's hardware
+    UrsaHardware robot   = new UrsaHardware();   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
     static final double     COUNTS_PER_INCH         = 64;

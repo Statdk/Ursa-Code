@@ -69,7 +69,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Tensoria", group="Linear Opmode")
+@TeleOp(name="Tensoria", group="Tensoria")
 public class Tensoria extends LinearOpMode {
 
     // Declare OpMode members.

@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -44,6 +45,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.teamcode.UrsaBot.UrsaHardware;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +70,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="TensoriaAutonomous", group="Linear Opmode")
+@TeleOp(name="Tensoria Drive", group="Tensoria")
 public class TensoriaAutonomous extends LinearOpMode {
 
     // Declare OpMode members.
@@ -114,8 +116,13 @@ public class TensoriaAutonomous extends LinearOpMode {
 
     private boolean isDetecting = true;
 
+    UrsaHardware robot   = new UrsaHardware();   // Hardware class
+
     @Override
     public void runOpMode() {
+        robot.init(hardwareMap);
+
+        //region Tensoria Setup
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
 
@@ -263,6 +270,26 @@ public class TensoriaAutonomous extends LinearOpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+        //endregion
+
+        //region Encoder Setup
+        robot.leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+
+        robot.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        robot.leftFront. setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.leftBack.  setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightBack. setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //endregion
 
         waitForStart();
         runtime.reset();
@@ -291,10 +318,17 @@ public class TensoriaAutonomous extends LinearOpMode {
 
             if (largestRecog == null) { // No rings found, go to tile A
                 telemetry.addData("Tile", "A");
+                encoderDrive(robot.DRIVE_SPEED, 72, 72, 72, 72, 5.0); // forward 3 tiles
+                encoderDrive(robot.TURN_SPEED, 24, -24, 24, -24, 5.0); // 90° left turn                encoderDrive(robot.DRIVE_SPEED, 72, 72, 72, 72, 5.0); // forward 3 tiles
+                encoderDrive(robot.DRIVE_SPEED, 24, 24, 24, 24, 5.0); // forward 1 tile
             } else if (largestRecog.getHeight() > /* SOME CONSTANT */ 150) { // Four ring found, go to tile C
                 telemetry.addData("Tile", "C");
+                encoderDrive(robot.DRIVE_SPEED, 120, 120, 120, 120, 10.0); // forward 5 tiles
+                encoderDrive(robot.TURN_SPEED, 24, -24, 24, -24, 5.0); // 90° left turn                encoderDrive(robot.DRIVE_SPEED, 72, 72, 72, 72, 5.0); // forward 3 tiles
+                encoderDrive(robot.DRIVE_SPEED, 24, 24, 24, 24, 5.0); // forward 1 tile
             } else { // Middle ring height, go to tile B
                 telemetry.addData("Tile", "B");
+                encoderDrive(robot.DRIVE_SPEED, 96, 96, 96, 96, 5.0); // forward 4 tiles
             }
 
             if (largestRecog != null) {
@@ -308,10 +342,6 @@ public class TensoriaAutonomous extends LinearOpMode {
             telemetry.update();
         }
     }
-
-//    private void initVuforia() {
-//
-//    }
 
     /**
      * Initialize the TensorFlow Object Detection engine.
@@ -331,7 +361,7 @@ public class TensoriaAutonomous extends LinearOpMode {
             // the last time that call was made.
             List<Recognition> recognitions = tfod.getRecognitions();
             if (recognitions != null) {
-                telemetry.addData("# Object Detected", recognitions.size());
+                //telemetry.addData("# Object Detected", recognitions.size());
 
                 return recognitions;
 
@@ -354,7 +384,7 @@ public class TensoriaAutonomous extends LinearOpMode {
         targetVisible = false;
         for (VuforiaTrackable trackable : allTrackables) {
             if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
-                telemetry.addData("Visible Target", trackable.getName());
+                //telemetry.addData("Visible Target", trackable.getName());
                 targetVisible = true;
 
                 // getUpdatedRobotLocation() will return null if no new information is available since
@@ -393,5 +423,76 @@ public class TensoriaAutonomous extends LinearOpMode {
 
     public Orientation getVuforiaRotation(OpenGLMatrix lastLocation) {
         return Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
+    }
+
+    public void encoderDrive(double speed,
+                             double leftFrontInches, double rightFrontInches,
+                             double leftBackInches, double rightBackInches,
+                             double timeoutS) {
+        int newLeftFrontTarget;
+        int newLeftBackTarget;
+        int newRightFrontTarget;
+        int newRightBackTarget;
+
+        // Ensure that the opmode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newLeftFrontTarget = robot.leftFront.getCurrentPosition() + (int)(leftFrontInches * robot.COUNTS_PER_INCH);
+            newLeftBackTarget = robot.leftBack.getCurrentPosition() + (int)(leftBackInches * robot.COUNTS_PER_INCH);
+            newRightFrontTarget = robot.rightFront.getCurrentPosition() + (int)(rightFrontInches * robot.COUNTS_PER_INCH);
+            newRightBackTarget = robot.rightBack.getCurrentPosition() + (int)(rightBackInches * robot.COUNTS_PER_INCH);
+            robot.leftFront.setTargetPosition(newLeftFrontTarget);
+            robot.leftBack.setTargetPosition(newLeftBackTarget);
+            robot.rightFront.setTargetPosition(newRightFrontTarget);
+            robot.rightBack.setTargetPosition(newRightBackTarget);
+
+            // Turn On RUN_TO_POSITION
+            robot.leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            robot.leftFront.setPower(Math.abs(speed));
+            robot.leftBack.setPower(Math.abs(speed));
+            robot.rightFront.setPower(Math.abs(speed));
+            robot.rightBack.setPower(Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.leftFront.isBusy() && robot.rightFront.isBusy() && robot.rightBack.isBusy() && robot.rightFront.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Path1",  "Running to %7d %7d %7d %7d", newLeftFrontTarget, newLeftBackTarget, newRightFrontTarget, newRightBackTarget);
+                telemetry.addData("Path2",  "Running at %7d %7d %7d %7d",
+                        robot.leftFront.getCurrentPosition(),
+                        robot.leftBack.getCurrentPosition(),
+                        robot.rightFront.getCurrentPosition(),
+                        robot.rightBack.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            robot.leftFront.setPower(0);
+            robot.rightFront.setPower(0);
+            robot.leftBack.setPower(0);
+            robot.rightBack.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            robot.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            //  sleep(250);   // optional pause after each move
+        }
     }
 }
