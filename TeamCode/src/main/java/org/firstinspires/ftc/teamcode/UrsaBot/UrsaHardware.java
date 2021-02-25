@@ -24,7 +24,7 @@ public class UrsaHardware
     boolean intakeUpToggle = true;
 
     // Constants
-    public final double     COUNTS_PER_INCH         = 64;
+    public final double     COUNTS_PER_INCH         = 62;
     public final double     DRIVE_SPEED             = 0.6;
     public final double     TURN_SPEED              = 0.35;
 

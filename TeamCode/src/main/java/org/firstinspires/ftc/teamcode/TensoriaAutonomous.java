@@ -119,6 +119,7 @@ public class TensoriaAutonomous extends LinearOpMode {
 
     UrsaHardware robot   = new UrsaHardware();   // Hardware class
 
+    private static final boolean UseWebcam = false;
     WebcamName webcamName;
 
     @Override
@@ -133,14 +134,14 @@ public class TensoriaAutonomous extends LinearOpMode {
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
 
-        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        if (UseWebcam) webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = CameraDirection.BACK;
 
-        parameters.cameraName = webcamName;
+        if (UseWebcam) parameters.cameraName = webcamName;
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -324,19 +325,23 @@ public class TensoriaAutonomous extends LinearOpMode {
                     largestRecog = null;
             }
 
+            int TargetZone = 0;
             if (largestRecog == null) { // No rings found, go to tile A
                 telemetry.addData("Tile", "A");
                 encoderDrive(robot.DRIVE_SPEED, 72, 72, 72, 72, 5.0); // forward 3 tiles
                 encoderDrive(robot.TURN_SPEED, 24, -24, 24, -24, 5.0); // 90° left turn                encoderDrive(robot.DRIVE_SPEED, 72, 72, 72, 72, 5.0); // forward 3 tiles
                 encoderDrive(robot.DRIVE_SPEED, 24, 24, 24, 24, 5.0); // forward 1 tile
+                TargetZone = 1; //Keep track of Target Zone
             } else if (largestRecog.getHeight() > /* SOME CONSTANT */ 150) { // Four ring found, go to tile C
                 telemetry.addData("Tile", "C");
                 encoderDrive(robot.DRIVE_SPEED, 120, 120, 120, 120, 10.0); // forward 5 tiles
                 encoderDrive(robot.TURN_SPEED, 24, -24, 24, -24, 5.0); // 90° left turn                encoderDrive(robot.DRIVE_SPEED, 72, 72, 72, 72, 5.0); // forward 3 tiles
                 encoderDrive(robot.DRIVE_SPEED, 24, 24, 24, 24, 5.0); // forward 1 tile
+                TargetZone = 3; //Keep track of Target Zone
             } else { // Middle ring height, go to tile B
                 telemetry.addData("Tile", "B");
                 encoderDrive(robot.DRIVE_SPEED, 96, 96, 96, 96, 5.0); // forward 4 tiles
+                TargetZone = 2; //Keep track of Target Zone
             }
 
             if (largestRecog != null) {
@@ -345,8 +350,56 @@ public class TensoriaAutonomous extends LinearOpMode {
             }
             telemetry.update();
 
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            tfod.deactivate();
+
+            //Drop the wobble goal...
+            telemetry.addLine("Feigned wobble goal drop");
+            telemetry.update();
+            sleep(2000);
+
+            //Turn towards front picture
+            if (TargetZone == 1) { // Tile A
+                encoderDrive(robot.DRIVE_SPEED, -24, -24, -24, -24, 5.0); // Reverse 1 tile
+                encoderDrive(robot.TURN_SPEED, -24, 24, -24, 24, 5.0); // 90° right turn
+                encoderDrive(robot.DRIVE_SPEED, 24, 24, 24, 24, 5.0); // forward 1 tile
+            } else if (TargetZone == 3) { // Tile C
+                encoderDrive(robot.DRIVE_SPEED, -24, -24, -24, -24, 5.0); // Reverse 1 tile
+                encoderDrive(robot.TURN_SPEED, -24, 24, -24, 24, 5.0); // 90° right turn
+                encoderDrive(robot.DRIVE_SPEED, -24, -24, -24, -24, 5.0); // Reverse 1 tile
+            }
+
+            //Use vuforia to align 1 tile away from Blue Tower Goal Target
+            sleep(1000);
+            for (int i = 0; i < 5; i++) { // Check if the target is visible 5 times
+                if (getVuforia(allTrackables) != null) {
+                    break;
+                }
+                sleep(2000);
+
+                telemetry.addLine("Vuforia Attempt: " + Integer.toString(i + 5));
+                telemetry.update();
+            }
+
+            //NOTE: 1.5 tiles in the Y axis is in front of the goal
+
+            float Heading = getVuforiaRotation(getVuforia(allTrackables)).thirdAngle;
+            if (Heading < -5) { // If robot is turned left more than 5°
+
+            } else if (Heading > 5) {// If robot is turned right more than 5°
+
+            }
+
+
+            //Reverse two tiles using encoders to get behind scoring line. Change based on opimal firing distance of launcher
+
+            //Fire projectiles...
+            telemetry.addLine("Feigned Launch");
+            telemetry.update();
+
+
+
+            // End of Line
+            telemetry.addData("Autonomous Complete", "Run Time: " + runtime.toString());
             telemetry.update();
         }
     }
@@ -502,5 +555,16 @@ public class TensoriaAutonomous extends LinearOpMode {
 
             //  sleep(250);   // optional pause after each move
         }
+    }
+    public void Drive(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
+        robot.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        robot.leftFront.setPower(leftFrontPower);
+        robot.rightFront.setPower(rightFrontPower);
+        robot.leftBack.setPower(leftBackPower);
+        robot.rightBack.setPower(rightBackPower);
     }
 }
