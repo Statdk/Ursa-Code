@@ -369,25 +369,20 @@ public class TensoriaAutonomous extends LinearOpMode {
             }
 
             //Use vuforia to align 1 tile away from Blue Tower Goal Target
-            sleep(1000);
             for (int i = 0; i < 5; i++) { // Check if the target is visible 5 times
+                sleep(2000);
                 if (getVuforia(allTrackables) != null) {
                     break;
                 }
-                sleep(2000);
 
                 telemetry.addLine("Vuforia Attempt: " + Integer.toString(i + 5));
                 telemetry.update();
             }
 
             //NOTE: 1.5 tiles in the Y axis is in front of the goal
-
-            float Heading = getVuforiaRotation(getVuforia(allTrackables)).thirdAngle;
-            if (Heading < -5) { // If robot is turned left more than 5°
-
-            } else if (Heading > 5) {// If robot is turned right more than 5°
-
-            }
+            vuforiaDrive(allTrackables, "turn", false, 0.2, 0, 3);
+            vuforiaDrive(allTrackables, "y",true, robot.DRIVE_SPEED,
+                    (float) (1.5 * robot.TILE_SIZE), 3); // y switch needs finished
 
 
             //Reverse two tiles using encoders to get behind scoring line. Change based on opimal firing distance of launcher
@@ -486,6 +481,82 @@ public class TensoriaAutonomous extends LinearOpMode {
         return Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
     }
 
+    public void vuforiaDrive(List<VuforiaTrackable> allTrackables,
+                             String action, // "x", "y", or "turn"
+                             boolean strafe,
+                             double speed, // motor speed
+                             float target, // target position (x, y, or heading)
+                             float tolerance /*How far off is acceptable?*/){
+        float Heading = getVuforiaRotation(getVuforia(allTrackables)).thirdAngle;
+        VectorF location = getVuforiaTranslation(getVuforia(allTrackables));
+
+        if (!opModeIsActive()) return;
+
+        switch (action) {
+            case "x":
+                // do later...
+                break;
+
+            case "y":
+                location.get(1);
+                if (strafe) Heading += 90; // when strafing, the left side is the front
+
+                if (Heading > 0) { // facing left of 0
+                    if (location.get(1) > target) { // in front of target
+
+                    } else if (location.get(1) < target) { // behind target
+
+                    }
+                } else if (Heading < 0) { // facing right of 0
+                    if (location.get(1) > target) { // behind target
+
+                    } else if (location.get(1) < target) { // in front of target
+
+                    }
+                }
+                break;
+
+            case "turn":
+                do {
+                    if (Heading < target) { // If we are right of the target
+                        drive(-speed, speed, -speed, speed); // Turn left
+
+                        while (Heading < target
+                                && opModeIsActive()) { // Loop while Heading is less than target
+                            telemetry.addLine("Heading: " + Heading);
+                            telemetry.addLine("Target: " + target);
+                            telemetry.update();
+                            sleep(5);
+                            Heading = getVuforiaRotation(getVuforia(allTrackables)).thirdAngle;
+                        }
+
+                    } else if (Heading > target) { // If we are left of the target
+                        drive(speed, -speed, speed, -speed); // Turn right
+
+                        while (Heading > target
+                                && opModeIsActive()) { // Loop while Heading is greater than target
+                            telemetry.addLine("Heading: " + Heading);
+                            telemetry.addLine("Target: " + target);
+                            telemetry.update();
+                            sleep(5);
+                            Heading = getVuforiaRotation(getVuforia(allTrackables)).thirdAngle;
+                        }
+                    }
+
+                    drive(0, 0, 0, 0);
+                    speed *= 0.8;
+
+                } while ((-tolerance < Heading || Heading < tolerance) && opModeIsActive());
+                break;
+
+
+            default:
+                throw new IllegalStateException("Unexpected value: " + action);
+        }
+
+        drive(0, 0, 0, 0);
+    }
+
     public void encoderDrive(double speed,
                              double leftFrontInches, double rightFrontInches,
                              double leftBackInches, double rightBackInches,
@@ -556,11 +627,18 @@ public class TensoriaAutonomous extends LinearOpMode {
             //  sleep(250);   // optional pause after each move
         }
     }
-    public void Drive(double leftFrontPower, double rightFrontPower, double leftBackPower, double rightBackPower) {
+
+    public void drive(double leftFrontPower, double rightFrontPower,
+                      double leftBackPower, double rightBackPower) {
         robot.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        robot.leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         robot.leftFront.setPower(leftFrontPower);
         robot.rightFront.setPower(rightFrontPower);
