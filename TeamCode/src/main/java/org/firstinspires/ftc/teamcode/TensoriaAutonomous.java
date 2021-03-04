@@ -302,7 +302,7 @@ public class TensoriaAutonomous extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        while (opModeIsActive()) {
+        if (opModeIsActive()) {
 
             List<Recognition> tfodRecogs = getTfodRecognitions();
 
@@ -386,16 +386,21 @@ public class TensoriaAutonomous extends LinearOpMode {
 
 
             //Reverse two tiles using encoders to get behind scoring line. Change based on opimal firing distance of launcher
+            encoderDrive(robot.DRIVE_SPEED, -1.5 * robot.TILE_SIZE, 7.0);
+
 
             //Fire projectiles...
             telemetry.addLine("Feigned Launch");
             telemetry.update();
 
 
-
-            // End of Line
+            // Park on the line
+            encoderDrive(robot.DRIVE_SPEED, 0.25 * robot.TILE_SIZE, 7.0);
+            drive(0);
             telemetry.addData("Autonomous Complete", "Run Time: " + runtime.toString());
             telemetry.update();
+
+            // END OF LINE
         }
     }
 
@@ -410,6 +415,7 @@ public class TensoriaAutonomous extends LinearOpMode {
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
+
 
     public List<Recognition> getTfodRecognitions() {
         if (tfod != null) {
@@ -434,6 +440,7 @@ public class TensoriaAutonomous extends LinearOpMode {
         }
         return null;
     }
+
 
     public OpenGLMatrix getVuforia(List<VuforiaTrackable> allTrackables) {
         // check all the trackable targets to see which one (if any) is visible.
@@ -473,20 +480,24 @@ public class TensoriaAutonomous extends LinearOpMode {
         }
     }
 
+
     public VectorF getVuforiaTranslation(OpenGLMatrix lastLocation) {
         return lastLocation.getTranslation();
     }
+
 
     public Orientation getVuforiaRotation(OpenGLMatrix lastLocation) {
         return Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
     }
 
+
     public void vuforiaDrive(List<VuforiaTrackable> allTrackables,
                              String action, // "x", "y", or "turn"
-                             boolean strafe,
+                             boolean strafe, // to strafe?
                              double speed, // motor speed
                              float target, // target position (x, y, or heading)
                              float tolerance /*How far off is acceptable?*/){
+
         float Heading = getVuforiaRotation(getVuforia(allTrackables)).thirdAngle;
         VectorF location = getVuforiaTranslation(getVuforia(allTrackables));
 
@@ -498,40 +509,56 @@ public class TensoriaAutonomous extends LinearOpMode {
                 break;
 
             case "y":
-                location.get(1);
-                if (strafe) Heading += 90; // when strafing, the left side is the front
+                if (strafe) Heading -= 90; // when strafing, the right side is the front
 
-                if (Heading > 0) { // facing left of 0
-                    if (location.get(1) > target) { // in front of target
-
-                    } else if (location.get(1) < target) { // behind target
-
+                for (int i = 0; i < 5; i++) {
+                    if ((Heading > 0/*facing left of 0*/ && location.get(1) > target/*in front of target*/) ||
+                            (Heading < 0/*facing right of 0*/ && location.get(1) < target/*in front of target*/)) {
+                        // drive backward
+                        if (strafe) strafeDrive(speed);
+                        else drive(-speed);
+                    } else if ((Heading > 0/*facing left of 0*/ && location.get(1) < target/*behind of target*/) ||
+                            (Heading < 0/*facing right of 0*/ && location.get(1) > target/*behind target*/)) {
+                        // drive forward
+                        if (strafe) strafeDrive(speed);
+                        else drive(speed);
                     }
-                } else if (Heading < 0) { // facing right of 0
-                    if (location.get(1) > target) { // behind target
 
-                    } else if (location.get(1) < target) { // in front of target
+                    while ((location.get(1) > target || target < location.get(1))
+                            && opModeIsActive()) {
+                        location = getVuforiaTranslation(getVuforia(allTrackables));
 
+                        telemetry.addLine("Location X: " + location.get(0));
+                        telemetry.addLine("Location Y: " + location.get(1));
+                        telemetry.addLine("Target: " + target);
+                        telemetry.update();
+                        sleep(5);
                     }
+
+                    drive(0);
+
+                    sleep(2000);
+                    if (location.get(1) > target || target < location.get(1)) break;
                 }
+
                 break;
 
             case "turn":
                 do {
                     if (Heading < target) { // If we are right of the target
-                        drive(-speed, speed, -speed, speed); // Turn left
+                        drive(-speed, speed); // Turn left
 
                         while (Heading < target
                                 && opModeIsActive()) { // Loop while Heading is less than target
+                            Heading = getVuforiaRotation(getVuforia(allTrackables)).thirdAngle;
                             telemetry.addLine("Heading: " + Heading);
                             telemetry.addLine("Target: " + target);
                             telemetry.update();
                             sleep(5);
-                            Heading = getVuforiaRotation(getVuforia(allTrackables)).thirdAngle;
                         }
 
                     } else if (Heading > target) { // If we are left of the target
-                        drive(speed, -speed, speed, -speed); // Turn right
+                        drive(speed, -speed); // Turn right
 
                         while (Heading > target
                                 && opModeIsActive()) { // Loop while Heading is greater than target
@@ -543,7 +570,7 @@ public class TensoriaAutonomous extends LinearOpMode {
                         }
                     }
 
-                    drive(0, 0, 0, 0);
+                    drive(0);
                     speed *= 0.8;
 
                 } while ((-tolerance < Heading || Heading < tolerance) && opModeIsActive());
@@ -554,8 +581,16 @@ public class TensoriaAutonomous extends LinearOpMode {
                 throw new IllegalStateException("Unexpected value: " + action);
         }
 
-        drive(0, 0, 0, 0);
+        drive(0);
     }
+
+
+    public void encoderDrive(double speed,
+                             double allInches,
+                             double timeoutS) {
+        encoderDrive(speed, allInches, allInches, allInches, allInches, timeoutS);
+    }
+
 
     public void encoderDrive(double speed,
                              double leftFrontInches, double rightFrontInches,
@@ -627,6 +662,51 @@ public class TensoriaAutonomous extends LinearOpMode {
             //  sleep(250);   // optional pause after each move
         }
     }
+
+
+    public void strafeDrive(double power) { // Right is positive
+        robot.leftFront.setPower(power);
+        robot.rightFront.setPower(-power);
+        robot.rightBack.setPower(power);
+        robot.leftBack.setPower(-power);
+    }
+
+
+    public void drive(double power) {
+        robot.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        robot.leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        robot.leftFront.setPower(power);
+        robot.rightFront.setPower(power);
+        robot.leftBack.setPower(power);
+        robot.rightBack.setPower(power);
+    }
+
+
+    public void drive(double leftPower, double rightPower) {
+        robot.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        robot.leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        robot.leftFront.setPower(leftPower);
+        robot.rightFront.setPower(rightPower);
+        robot.leftBack.setPower(leftPower);
+        robot.rightBack.setPower(rightPower);
+    }
+
 
     public void drive(double leftFrontPower, double rightFrontPower,
                       double leftBackPower, double rightBackPower) {
