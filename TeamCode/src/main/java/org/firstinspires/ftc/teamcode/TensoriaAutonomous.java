@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -119,6 +120,7 @@ public class TensoriaAutonomous extends LinearOpMode {
 
     UrsaHardware robot   = new UrsaHardware();   // Hardware class
 
+    private static final boolean ursaBot = false;
     private static final boolean UseWebcam = false;
     WebcamName webcamName;
 
@@ -293,10 +295,19 @@ public class TensoriaAutonomous extends LinearOpMode {
         robot.leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        robot.leftFront. setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.leftBack.  setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        robot.rightBack. setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        if (!ursaBot) {
+            robot.leftFront.setDirection(DcMotor.Direction.FORWARD);
+            robot.rightFront.setDirection(DcMotor.Direction.FORWARD);
+            robot.leftBack.setDirection(DcMotor.Direction.REVERSE);
+            robot.rightBack.setDirection(DcMotor.Direction.REVERSE);
+            robot.TILE_SIZE = (double) robot.TILE_SIZE * 0.8 /*20/25 teeth*/;
+            //Change encoder ticks per inch next...
+        }
 
         //endregion
 
