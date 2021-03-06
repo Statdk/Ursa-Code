@@ -34,6 +34,28 @@ public class testOpMode extends LinearOpMode {
             robot.leftBack.setPower(y - x + rx);
             robot.rightBack.setPower(y + x - rx);
 
+            if (gamepad1.right_bumper) {
+                robot.launcherMotor.setPower(robot.launcherSpeed);
+            }
+
+            if (gamepad1.dpad_up) {
+                robot.launcherSpeed += 0.05;
+                sleep(500);
+                if (robot.launcherSpeed > 1) {robot.launcherSpeed = 1;}
+            }
+
+            if (gamepad1.dpad_down) {
+                robot.launcherSpeed -= 0.05;
+                sleep(500);
+                if (robot.launcherSpeed < 0) {robot.launcherSpeed = 0;}
+            }
+
+            if (gamepad1.dpad_right) {robot.launcherSpeed = 1;
+                                      sleep(500);}
+
+            if (gamepad1.dpad_left) {robot.launcherSpeed = 0;
+                sleep(500);}
+
             //unable to figure out how to show motor powers, if you know how, replace this lin with the code.
             telemetry.addData("Run Time", runtime.toString());
             telemetry.update();
