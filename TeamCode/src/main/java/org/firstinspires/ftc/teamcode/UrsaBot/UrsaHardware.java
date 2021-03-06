@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 //hardware mapping for the robot, please contribute when necessary.
-public class UrsaPushbot
+public class UrsaHardware
 {
 
     public DcMotor leftFront    = null;
@@ -18,18 +18,20 @@ public class UrsaPushbot
     public DcMotor wobbleGoalRot = null;
     public DcMotor intakeMotor  = null;
     public DcMotor intakeUp     = null;
+    public DcMotor launcherMotor = null;
     public Servo wobbleGoalLifter = null;
     public Servo wobbleGoalPusher = null;
     boolean intakeToggle = true;
     boolean intakeUpToggle = true;
     double DRIVE_SPEED = 0.6;
     double TURN_SPEED = 0.35;
+    double launcherSpeed = 0;
 
     public static final double BRAKE = 0;
 
     HardwareMap UrsaMap           = null;
 
-    public UrsaPushbot(){
+    public UrsaHardware(){
 
     }
 
