@@ -56,7 +56,6 @@ public class testOpMode extends LinearOpMode {
             if (gamepad1.dpad_left) {robot.launcherSpeed = 0;
                 sleep(500);}
 
-            //unable to figure out how to show motor powers, if you know how, replace this lin with the code.
             telemetry.addData("Run Time", runtime.toString());
             telemetry.update();
         }
