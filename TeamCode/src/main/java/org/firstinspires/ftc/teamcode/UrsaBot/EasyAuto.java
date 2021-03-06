@@ -113,17 +113,21 @@ public class EasyAuto extends LinearOpMode {
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
                              double timeoutS) {
-        int newLeftTarget;
-        int newRightTarget;
+        int newLeftFrontTarget;
+        int newRightFrontTarget;
+        int newLeftBackTarget;
+        int newRightBackTarget;
 
         if (opModeIsActive()) {
 
-            newLeftTarget = robot.leftFront.getCurrentPosition() + (int)(leftInches * ticksPerInch);
-            newRightTarget = robot.rightBack.getCurrentPosition() + (int)(rightInches * ticksPerInch);
-            robot.leftFront.setTargetPosition(newLeftTarget);
-            robot.rightFront.setTargetPosition(newRightTarget);
-            robot.leftBack.setTargetPosition(newLeftTarget);
-            robot.rightBack.setTargetPosition(newRightTarget);
+            newLeftFrontTarget = robot.leftFront.getCurrentPosition() + (int)(leftInches * ticksPerInch);
+            newRightFrontTarget = robot.rightFront.getCurrentPosition() + (int)(rightInches * ticksPerInch);
+            newLeftBackTarget = robot.leftBack.getCurrentPosition() + (int)(leftInches * ticksPerInch);
+            newRightBackTarget = robot.rightBack.getCurrentPosition() + (int)(rightInches * ticksPerInch);
+            robot.leftFront.setTargetPosition(newLeftFrontTarget);
+            robot.rightFront.setTargetPosition(newRightFrontTarget);
+            robot.leftBack.setTargetPosition(newLeftBackTarget);
+            robot.rightBack.setTargetPosition(newRightBackTarget);
 
             robot.leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -141,13 +145,13 @@ public class EasyAuto extends LinearOpMode {
                     (robot.leftFront.isBusy() && robot.rightFront.isBusy() &&
                     robot.leftBack.isBusy() && robot.rightBack.isBusy())) {
 
-                telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
-                telemetry.addData("Path2",  "Running at %7d :%7d",
-                        robot.leftFront.getCurrentPosition(),
-                        robot.rightFront.getCurrentPosition(),
-                        robot.leftBack.getCurrentPosition(),
-                        robot.rightBack.getCurrentPosition());
-                telemetry.update();
+                //telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
+                //telemetry.addData("Path2",  "Running at %7d :%7d",
+                        robot.leftFront.getCurrentPosition();
+                        robot.rightFront.getCurrentPosition();
+                        robot.leftBack.getCurrentPosition();
+                        robot.rightBack.getCurrentPosition();
+                //telemetry.update();
             }
 
             // Stop all motion;
