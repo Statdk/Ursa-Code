@@ -32,7 +32,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.vuforia.CameraDevice;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -69,7 +71,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Tensoria", group="Linear Opmode")
+@TeleOp(name="Tensoria", group="Tensoria")
 public class Tensoria extends LinearOpMode {
 
     // Declare OpMode members.
@@ -113,6 +115,11 @@ public class Tensoria extends LinearOpMode {
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
 
+    private boolean isDetecting = true;
+
+    private static final boolean UseWebcam = false;
+    WebcamName webcamName;
+
     @Override
     public void runOpMode() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
@@ -121,10 +128,15 @@ public class Tensoria extends LinearOpMode {
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          */
+
+        if (UseWebcam) webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection = CameraDirection.BACK;
+
+        if (UseWebcam) parameters.cameraName = webcamName;
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
@@ -243,11 +255,10 @@ public class Tensoria extends LinearOpMode {
         targetsUltimateGoal.activate();
 
 
-//        initVuforia();
         initTfod();
 
         if (tfod != null) {
-            tfod.activate();
+//            tfod.activate();
 
             // The TensorFlow software will scale the input images from the camera to a lower resolution.
             // This can result in lower detection accuracy at longer distances (> 55cm or 22").
@@ -265,13 +276,15 @@ public class Tensoria extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        while (opModeIsActive()) {
 
+        while (opModeIsActive()) {
 
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
-                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                List<Recognition> updatedRecognitions = tfod.getRecognitions();
+
+
                 if (updatedRecognitions != null) {
                     telemetry.addData("# Object Detected", updatedRecognitions.size());
 
@@ -283,10 +296,10 @@ public class Tensoria extends LinearOpMode {
                                 recognition.getLeft(), recognition.getTop());
                         telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
                                 recognition.getRight(), recognition.getBottom());
+                        telemetry.addLine(String.valueOf(recognition.getLeft()));
                     }
                 }
             }
-
 
             // check all the trackable targets to see which one (if any) is visible.
             targetVisible = false;
@@ -328,9 +341,6 @@ public class Tensoria extends LinearOpMode {
         }
     }
 
-//    private void initVuforia() {
-//
-//    }
 
     /**
      * Initialize the TensorFlow Object Detection engine.

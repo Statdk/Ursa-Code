@@ -1,17 +1,13 @@
 package org.firstinspires.ftc.teamcode.UrsaBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 @Autonomous(name = "EncoderDrive")
 public class EncoderDrive extends EasyAuto {
 
-    UrsaPushbot robot = new UrsaPushbot();
+    UrsaHardware robot = new UrsaHardware();
 
     @Override
     public void runOpMode() {

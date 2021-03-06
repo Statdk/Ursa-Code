@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="TestOpMode")
 public class testOpMode extends LinearOpMode {
 
-    UrsaPushbot robot = new UrsaPushbot();
+    UrsaHardware robot = new UrsaHardware();
 
     private ElapsedTime runtime = new ElapsedTime();
 
