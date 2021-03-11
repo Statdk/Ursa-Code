@@ -23,9 +23,12 @@ public class UrsaHardware
     public Servo wobbleGoalPusher = null;
     boolean intakeToggle = true;
     boolean intakeUpToggle = true;
-    double DRIVE_SPEED = 0.6;
-    double TURN_SPEED = 0.35;
-    double launcherSpeed = 0;
+
+    // Constants
+    public final double     COUNTS_PER_INCH         = 62;
+    public final double     DRIVE_SPEED             = 0.6;
+    public final double     TURN_SPEED              = 0.35;
+    public double           TILE_SIZE               = 24;
 
     public static final double BRAKE = 0;
 
