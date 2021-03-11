@@ -154,7 +154,7 @@ public class EasyAuto extends LinearOpMode {
                 //telemetry.update();
             }
 
-            // Stop all motion;
+            // Stop all motion
             robot.leftFront.setPower(0);
             robot.rightBack.setPower(0);
             robot.leftFront.setPower(0);
