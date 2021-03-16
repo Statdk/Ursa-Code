@@ -56,6 +56,16 @@ public class testOpMode extends LinearOpMode {
             if (gamepad1.dpad_left) {robot.launcherSpeed = 0;
                 sleep(500);}
 
+            if (gamepad1.x) {
+                sleep(800);
+                robot.launcher_fire.setPosition(0.5);
+                robot.launcherMotor.setPower(1);
+                sleep(500);
+                robot.launcher_fire.setPosition(1);
+            }
+
+
+
             telemetry.addData("Run Time", runtime.toString());
             telemetry.update();
         }

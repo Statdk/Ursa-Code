@@ -19,6 +19,7 @@ public class UrsaHardware
     public DcMotor intakeMotor  = null;
     public DcMotor intakeUp     = null;
     public DcMotor launcherMotor = null;
+    public Servo launcher_fire = null;
     public Servo wobbleGoalLifter = null;
     public Servo wobbleGoalPusher = null;
     public double launcherSpeed = 0;
