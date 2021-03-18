@@ -106,12 +106,12 @@ public class EasyAuto extends LinearOpMode {
         sleep(time);
     }
 
-    public void EncoderForward(double DistanceIN, Double Time) {
-        encoderDrive(driveSpeed, DistanceIN, DistanceIN, Time);
+    public void encoderFoward (double power, double time) {
+        encoderDrive(0.6, power, power, power, power, time);
     }
 
     public void encoderDrive(double speed,
-                             double leftInches, double rightInches,
+                             double leftFrontInches, double rightFrontInches, double leftBackInches, double rightBackInches,
                              double timeoutS) {
         int newLeftFrontTarget;
         int newRightFrontTarget;
@@ -120,10 +120,10 @@ public class EasyAuto extends LinearOpMode {
 
         if (opModeIsActive()) {
 
-            newLeftFrontTarget = robot.leftFront.getCurrentPosition() + (int)(leftInches * ticksPerInch);
-            newRightFrontTarget = robot.rightFront.getCurrentPosition() + (int)(rightInches * ticksPerInch);
-            newLeftBackTarget = robot.leftBack.getCurrentPosition() + (int)(leftInches * ticksPerInch);
-            newRightBackTarget = robot.rightBack.getCurrentPosition() + (int)(rightInches * ticksPerInch);
+            newLeftFrontTarget = robot.leftFront.getCurrentPosition() + (int)(leftFrontInches * ticksPerInch);
+            newRightFrontTarget = robot.rightFront.getCurrentPosition() + (int)(rightFrontInches * ticksPerInch);
+            newLeftBackTarget = robot.leftBack.getCurrentPosition() + (int)(leftBackInches * ticksPerInch);
+            newRightBackTarget = robot.rightBack.getCurrentPosition() + (int)(rightBackInches * ticksPerInch);
             robot.leftFront.setTargetPosition(newLeftFrontTarget);
             robot.rightFront.setTargetPosition(newRightFrontTarget);
             robot.leftBack.setTargetPosition(newLeftBackTarget);
