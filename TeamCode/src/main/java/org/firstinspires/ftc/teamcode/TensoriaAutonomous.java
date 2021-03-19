@@ -64,15 +64,15 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
  * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- *
+ * <p>
  * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
  * It includes all the skeletal structure that all linear OpModes contain.
- *
+ * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Tensoria Drive", group="Tensoria")
+@TeleOp(name = "Tensoria Drive", group = "Tensoria")
 public class TensoriaAutonomous extends LinearOpMode {
 
     // Declare OpMode members.
@@ -98,27 +98,27 @@ public class TensoriaAutonomous extends LinearOpMode {
 
 
     private static final CameraDirection CAMERA_CHOICE = BACK;
-    private static final boolean PHONE_IS_PORTRAIT = false  ;
+    private static final boolean PHONE_IS_PORTRAIT = false;
 
     // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
     // We will define some constants and conversions here
-    private static final float mmPerInch        = 25.4f;
-    private static final float mmTargetHeight   = (6) * mmPerInch;          // the height of the center of the target image above the floor
+    private static final float mmPerInch = 25.4f;
+    private static final float mmTargetHeight = (6) * mmPerInch;          // the height of the center of the target image above the floor
 
     // Constants for perimeter targets
     private static final float halfField = 72 * mmPerInch;
-    private static final float quadField  = 36 * mmPerInch;
+    private static final float quadField = 36 * mmPerInch;
 
     // Class Members
     private OpenGLMatrix lastLocation = null;
     private boolean targetVisible = false;
-    private float phoneXRotate    = 0;
-    private float phoneYRotate    = 0;
-    private float phoneZRotate    = 0;
+    private float phoneXRotate = 0;
+    private float phoneYRotate = 0;
+    private float phoneZRotate = 0;
 
     private boolean isDetecting = true;
 
-    UrsaHardware robot   = new UrsaHardware();   // Hardware class
+    UrsaHardware robot = new UrsaHardware();   // Hardware class
 
     private static final boolean ursaBot = false;
     private static final boolean UseWebcam = false;
@@ -196,12 +196,12 @@ public class TensoriaAutonomous extends LinearOpMode {
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 0)));
         frontWallTarget.setLocation(OpenGLMatrix
                 .translation(-halfField, 0, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0 , 90)));
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, 90)));
 
         // The tower goal targets are located a quarter field length from the ends of the back perimeter wall.
         blueTowerGoalTarget.setLocation(OpenGLMatrix
                 .translation(halfField, quadField, mmTargetHeight)
-                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0 , -90)));
+                .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
         redTowerGoalTarget.setLocation(OpenGLMatrix
                 .translation(halfField, -quadField, mmTargetHeight)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
@@ -229,20 +229,20 @@ public class TensoriaAutonomous extends LinearOpMode {
 
         // Rotate the phone vertical about the X axis if it's in portrait mode
         if (PHONE_IS_PORTRAIT) {
-            phoneXRotate = 90 ;
+            phoneXRotate = 90;
         }
 
         // Next, translate the camera lens to where it is on the robot.
         // In this example, it is centered (left to right), but forward of the middle of the robot, and above ground level.
-        final float CAMERA_FORWARD_DISPLACEMENT  = 4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
+        final float CAMERA_FORWARD_DISPLACEMENT = 4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
         final float CAMERA_VERTICAL_DISPLACEMENT = 8.0f * mmPerInch;   // eg: Camera is 8 Inches above ground
-        final float CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is ON the robot's center line
+        final float CAMERA_LEFT_DISPLACEMENT = 0;     // eg: Camera is ON the robot's center line
 
         OpenGLMatrix robotFromCamera = OpenGLMatrix
                 .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
 
-        /**  Let all the trackable listeners know where the phone is.  */
+        /*  Let all the trackable listeners know where the phone is.  */
         for (VuforiaTrackable trackable : allTrackables) {
             ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
         }
@@ -324,7 +324,6 @@ public class TensoriaAutonomous extends LinearOpMode {
             // Filter the recognitions
             Recognition largestRecog = null;
             for (int i = 0; i < tfodRecogs.size(); i++) {
-                if (tfodRecogs.isEmpty()) break;
                 if (largestRecog == null) largestRecog = tfodRecogs.get(i);
 
                 if (tfodRecogs.get(i).getHeight() > largestRecog.getHeight())
@@ -336,7 +335,7 @@ public class TensoriaAutonomous extends LinearOpMode {
                     largestRecog = null;
             }
 
-            int TargetZone = 0;
+            int TargetZone;
             if (largestRecog == null) { // No rings found, go to tile A
                 telemetry.addData("Tile", "A");
                 encoderDrive(robot.DRIVE_SPEED, 72, 72, 72, 72, 5.0); // forward 3 tiles
@@ -386,13 +385,13 @@ public class TensoriaAutonomous extends LinearOpMode {
                     break;
                 }
 
-                telemetry.addLine("Vuforia Attempt: " + Integer.toString(i + 5));
+                telemetry.addLine("Vuforia Attempt: " + (i + 5));
                 telemetry.update();
             }
 
             //NOTE: 1.5 tiles in the Y axis is in front of the goal
             vuforiaDrive(allTrackables, "turn", false, 0.2, 0, 3);
-            vuforiaDrive(allTrackables, "y",true, robot.DRIVE_SPEED,
+            vuforiaDrive(allTrackables, "y", true, robot.DRIVE_SPEED,
                     (float) (1.5 * robot.TILE_SIZE), 3); // y switch needs finished
 
 
@@ -457,13 +456,13 @@ public class TensoriaAutonomous extends LinearOpMode {
         // check all the trackable targets to see which one (if any) is visible.
         targetVisible = false;
         for (VuforiaTrackable trackable : allTrackables) {
-            if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
+            if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
                 //telemetry.addData("Visible Target", trackable.getName());
                 targetVisible = true;
 
                 // getUpdatedRobotLocation() will return null if no new information is available since
                 // the last time that call was made, or if the trackable is not currently visible.
-                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
+                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener) trackable.getListener()).getUpdatedRobotLocation();
                 if (robotLocationTransform != null) {
                     lastLocation = robotLocationTransform;
                 }
@@ -483,8 +482,7 @@ public class TensoriaAutonomous extends LinearOpMode {
             telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
 
             return lastLocation;
-        }
-        else {
+        } else {
             telemetry.addData("Visible Target", "none");
 
             return null;
@@ -507,7 +505,7 @@ public class TensoriaAutonomous extends LinearOpMode {
                              boolean strafe, // to strafe?
                              double speed, // motor speed
                              float target, // target position (x, y, or heading)
-                             float tolerance /*How far off is acceptable?*/){
+                             float tolerance /*How far off is acceptable?*/) {
 
         float Heading = getVuforiaRotation(getVuforia(allTrackables)).thirdAngle;
         VectorF location = getVuforiaTranslation(getVuforia(allTrackables));
@@ -616,10 +614,10 @@ public class TensoriaAutonomous extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newLeftFrontTarget = robot.leftFront.getCurrentPosition() + (int)(leftFrontInches * robot.COUNTS_PER_INCH);
-            newLeftBackTarget = robot.leftBack.getCurrentPosition() + (int)(leftBackInches * robot.COUNTS_PER_INCH);
-            newRightFrontTarget = robot.rightFront.getCurrentPosition() + (int)(rightFrontInches * robot.COUNTS_PER_INCH);
-            newRightBackTarget = robot.rightBack.getCurrentPosition() + (int)(rightBackInches * robot.COUNTS_PER_INCH);
+            newLeftFrontTarget = robot.leftFront.getCurrentPosition() + (int) (leftFrontInches * robot.COUNTS_PER_INCH);
+            newLeftBackTarget = robot.leftBack.getCurrentPosition() + (int) (leftBackInches * robot.COUNTS_PER_INCH);
+            newRightFrontTarget = robot.rightFront.getCurrentPosition() + (int) (rightFrontInches * robot.COUNTS_PER_INCH);
+            newRightBackTarget = robot.rightBack.getCurrentPosition() + (int) (rightBackInches * robot.COUNTS_PER_INCH);
             robot.leftFront.setTargetPosition(newLeftFrontTarget);
             robot.leftBack.setTargetPosition(newLeftBackTarget);
             robot.rightFront.setTargetPosition(newRightFrontTarget);
@@ -649,8 +647,8 @@ public class TensoriaAutonomous extends LinearOpMode {
                     (robot.leftFront.isBusy() && robot.rightFront.isBusy() && robot.rightBack.isBusy() && robot.rightFront.isBusy())) {
 
                 // Display it for the driver.
-                telemetry.addData("Path1",  "Running to %7d %7d %7d %7d", newLeftFrontTarget, newLeftBackTarget, newRightFrontTarget, newRightBackTarget);
-                telemetry.addData("Path2",  "Running at %7d %7d %7d %7d",
+                telemetry.addData("Path1", "Running to %7d %7d %7d %7d", newLeftFrontTarget, newLeftBackTarget, newRightFrontTarget, newRightBackTarget);
+                telemetry.addData("Path2", "Running at %7d %7d %7d %7d",
                         robot.leftFront.getCurrentPosition(),
                         robot.leftBack.getCurrentPosition(),
                         robot.rightFront.getCurrentPosition(),
