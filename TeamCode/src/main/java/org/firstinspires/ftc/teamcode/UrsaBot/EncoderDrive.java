@@ -31,6 +31,6 @@ public class EncoderDrive extends EasyAuto {
                                                 robot.rightBack.getCurrentPosition());
         telemetry.update();
 
-        encoderDrive(driveSpeed, 24, 24, 50);
+//        encoderDrive(driveSpeed, 24, 24, 50);
     }
 }

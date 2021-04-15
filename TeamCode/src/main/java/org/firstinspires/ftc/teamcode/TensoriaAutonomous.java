@@ -121,7 +121,7 @@ public class TensoriaAutonomous extends LinearOpMode {
     UrsaHardware robot = new UrsaHardware();   // Hardware class
 
     private static final boolean ursaBot = false;
-    private static final boolean UseWebcam = false;
+    private static final boolean UseWebcam = true;
     WebcamName webcamName;
 
     @Override
